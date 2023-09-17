@@ -1,0 +1,6 @@
+; config.ini
+currency_source = 'http://www.finmarket.ru/currency/USD/'
+sleep = 3
+tracking_point = 0.5
+headers = {'User-Agent': ''Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'}
+log_config = {"level": "INFO", "format":"%(asctime)s %(levelname)s %(message)s", "filename": "logger.log"}
