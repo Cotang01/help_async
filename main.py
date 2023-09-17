@@ -14,20 +14,20 @@ class ParseIni:
         # config.ini на время дебага заменён на config.txt
         parser.add_argument('-c', '--config', default='config.txt',
                             is_config_file=True,
-                            help='Путь к файлу config.ini')
+                            help='Path to file config.ini')
         parser.add_argument('--currency_source',
                             default='http://www.finmarket.ru/currency/USD/',
-                            help='Источник веб-страницы с курсом валюты')
+                            help='Currency web-source')
         parser.add_argument('--sleep', default=3,
-                            help='Задержка обновления в секундах')
+                            help='Update delay in seconds')
         parser.add_argument('--tracking_point', default=0.5,
-                            help='Точка изменения курса')
+                            help='Change rate point')
         parser.add_argument('--headers',
                             default=
                             {
                                 'User-Agent': 'Mozilla/5.0'
                             },
-                            help='Заголовки запроса')
+                            help='Call headers')
         parser.add_argument('--log_config',
                             default=
                             {
@@ -36,7 +36,7 @@ class ParseIni:
                                     "%(asctime)s %(levelname)s %(message)s",
                                 "filename": "logger.log"
                             },
-                            help='Конфигурация логирования')
+                            help='Log configs')
         args = parser.parse_args()
         self.currency_source = args.currency_source
         self.sleep = args.sleep
@@ -76,7 +76,7 @@ class Currency:
                     raise ValueError
                 self.tracking_point = float(self.tracking_point)
                 if self.starting_currency is None:
-                    logger.warning("Старт! Текущая цена валюты: %f", currency)
+                    logger.warning("Start! Current currency value: %f", currency)
                     self.starting_currency = currency
                 if currency > self.starting_currency + self.tracking_point:
                     logger.warning(
@@ -93,12 +93,12 @@ class Currency:
                 await asyncio.sleep(float(self.sleep))
                 # Интервал по дефолту 3 секунды
             except ValueError as ve:
-                logger.error("Ошибка парсинга данных!")
+                logger.error("Error while data parsing!")
 
 
 async def waiting_input():
     loop = asyncio.get_event_loop()
-    return await loop.run_in_executor(None, input, 'Введите команду:\n')
+    return await loop.run_in_executor(None, input, 'Enter command:\n')
 
 
 async def main():
@@ -127,7 +127,7 @@ async def main():
     При логгировании будет использоваться .warning для той информации, которая
     должна выводиться в консоль
     '''
-    
+
     logger.warning(
         'List of commands:\n'
         'Currency - launch currency rate tracking and logging\n'
