@@ -10,9 +10,7 @@ import configargparse
 class ParseIni:
     def __init__(self):
         parser = configargparse.ArgParser()
-        # TODO line 15 вернуть config.txt обратно в config.ini если нужно
-        # config.ini на время дебага заменён на config.txt
-        parser.add_argument('-c', '--config', default='config.txt',
+        parser.add_argument('-c, --config', default='config.txt',
                             is_config_file=True,
                             help='Path to file config.ini')
         parser.add_argument('--currency_source',
@@ -22,18 +20,12 @@ class ParseIni:
                             help='Update delay in seconds')
         parser.add_argument('--tracking_point', default=0.5,
                             help='Change rate point')
-        parser.add_argument('--headers',
-                            default={
-                                'User-Agent': 'Mozilla/5.0'
-                            },
-                            help='Call headers')
+        parser.add_argument('--headers', default={'User-Agent': 'Mozilla/5.0'},
+                            help='Change rate point')
         parser.add_argument('--log_config',
-                            default={
-                                "level": logging.INFO,
-                                "format":
-                                    "%(asctime)s %(levelname)s %(message)s",
-                                "filename": "logger.log"
-                            },
+                            default={"level": logging.INFO,
+                                     "format": "%(asctime)s %(levelname)s %(message)s",
+                                     "filename": "logger.log"},
                             help='Log configs')
         args = parser.parse_args()
         self.currency_source = args.currency_source
@@ -45,54 +37,50 @@ class ParseIni:
 
 class Currency:
 
-    def __init__(self, currency_source, headers, tracking_point, sleep):
+    def __init__(self, currency_source, headers, tracking_point):
         self.currency_source = currency_source
         self.headers = headers
         self.tracking_point = tracking_point
         self.loop = asyncio.get_event_loop()
         self.start_flag = 0
         self.starting_currency = None
-        self.sleep = sleep
 
     async def get_currency_price(self):
         try:
-            full_page = await self.loop.run_in_executor(
-                None,
-                requests.get,
-                self.currency_source)
+            full_page = await self.loop.run_in_executor(None, requests.get, self.currency_source, {'headers': self.headers})
+            full_page.raise_for_status()
+
             soup = BeautifulSoup(full_page.content, 'html.parser')
             convert = soup.findAll("div", {"class": "valvalue"})
+
+            if not convert:
+                raise ValueError("Could not find elements with class 'valvalue'")
+
             return float(convert[0].text.replace(',', '.'))
-        except ValueError as ve:
-            return ve
+
+        except (requests.RequestException, ValueError) as e:
+            logging.exception("Error when getting exchange rates")
+            raise e
 
     async def check_currency(self, logger):
         while self.start_flag:
-            try:
-                currency = await self.get_currency_price()
-                if isinstance(currency, ValueError):
-                    raise ValueError
-                self.tracking_point = float(self.tracking_point)
-                if self.starting_currency is None:
-                    logger.warning("Start! Current currency value: %f",
-                                   currency)
-                    self.starting_currency = currency
-                if currency > self.starting_currency + self.tracking_point:
+            await asyncio.sleep(3)
+            currency = await self.get_currency_price()
+            self.tracking_point = float(self.tracking_point)
+            if self.starting_currency is None:
+                logger.warning("Start! Current currency value: %f", currency)
+                self.starting_currency = currency
+            if currency > self.starting_currency + self.tracking_point:
+                logger.warning(
+                    "The course has grown a lot! Current currency value: %f",
+                    currency)
+            else:
+                if currency < self.starting_currency - self.tracking_point:
                     logger.warning(
-                        "The course has grown a lot! "
-                        "Current currency value: %f",
+                        "The course has dropped a lot! Current currency value: %f",
                         currency)
-                else:
-                    if currency < self.starting_currency - self.tracking_point:
-                        logger.warning(
-                            "The course has dropped a lot! "
-                            "Current currency value: %f", currency)
-                    self.starting_currency = currency
-                    logger.info(f'{self.starting_currency}')
-                await asyncio.sleep(float(self.sleep))
-                # Интервал по дефолту 3 секунды
-            except ValueError as ve:
-                logger.error("Error while data parsing!" + str(ve))
+                self.starting_currency = currency
+                logger.info(f'{self.starting_currency}')
 
 
 async def waiting_input():
@@ -103,7 +91,7 @@ async def waiting_input():
 async def main():
     used_args = ParseIni()
     json_data = json.loads(used_args.log_config)
-    logger = logging.getLogger("main")
+    logger = logging.getLogger(__name__)
     logger.setLevel(json_data['level'])
     handler = logging.FileHandler(f'{json_data["filename"]}', mode='a')
     formatter = logging.Formatter(json_data['format'])
@@ -115,51 +103,30 @@ async def main():
     logger.addHandler(stream_handler)
 
     logger.info(used_args.log_config)
-    current_currency = Currency(
-        used_args.currency_source,
-        used_args.headers,
-        used_args.tracking_point,
-        used_args.sleep
-    )
-
-    '''
-    При логгировании будет использоваться .warning для той информации, которая
-    должна выводиться в консоль
-    '''
-
-    logger.warning(
-        'List of commands:\n'
-        'Currency - launch currency rate tracking and logging\n'
-        'Price - current price value\n'
-        'Exit - exit')
-
+    current_currency = Currency(used_args.currency_source, used_args.headers, used_args.tracking_point)
+    start = None
     temp = None
-    run = True
-    while run:
+    while True:
+        if start == "Currency":
+            current_currency.start_flag = 1
+            temp = asyncio.gather(current_currency.check_currency(logger))
+        elif start == 'Price':
+            logger.info(current_currency.starting_currency)
+        elif start == 'Exit':
+            current_currency.start_flag = 0
+            try:
+                await temp
+            except Exception as e:
+                logger.error('Logging has not started: %s', e)
+            break
+        elif start:
+            pass
+        else:
+            logger.warning(
+                'There is no such command\nList of commands:\nCurrency - launch currency rate tracking and logging'
+                '\nPrice - current price value\nExit - exit')
         start = await waiting_input()
-        match start:
-            case "Currency":
-                current_currency.start_flag = 1
-                temp = asyncio.gather(current_currency.check_currency(logger))
-            case 'Price':
-                logger.warning(current_currency.starting_currency)
-                try:
-                    await temp
-                except Exception as e:
-                    logger.error('Logging has not been started: %s', e)
-                break
-            case 'Exit':
-                current_currency.start_flag = 0
-                logger.warning("The program has been shut down")
-                run = False
-            case _:
-                logger.warning(
-                    'There is no such command\n'
-                    'List of commands:\n'
-                    'Currency - launch currency rate tracking and logging\n'
-                    'Price - current price value\nExit - exit'
-                )
 
 
 if __name__ == "__main__":
-    asyncio.get_event_loop().run_until_complete(main())
+    asyncio.run(main())
