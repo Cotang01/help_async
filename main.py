@@ -23,14 +23,12 @@ class ParseIni:
         parser.add_argument('--tracking_point', default=0.5,
                             help='Change rate point')
         parser.add_argument('--headers',
-                            default=
-                            {
+                            default={
                                 'User-Agent': 'Mozilla/5.0'
                             },
                             help='Call headers')
         parser.add_argument('--log_config',
-                            default=
-                            {
+                            default={
                                 "level": logging.INFO,
                                 "format":
                                     "%(asctime)s %(levelname)s %(message)s",
@@ -76,7 +74,8 @@ class Currency:
                     raise ValueError
                 self.tracking_point = float(self.tracking_point)
                 if self.starting_currency is None:
-                    logger.warning("Start! Current currency value: %f", currency)
+                    logger.warning("Start! Current currency value: %f",
+                                   currency)
                     self.starting_currency = currency
                 if currency > self.starting_currency + self.tracking_point:
                     logger.warning(
@@ -93,7 +92,7 @@ class Currency:
                 await asyncio.sleep(float(self.sleep))
                 # Интервал по дефолту 3 секунды
             except ValueError as ve:
-                logger.error("Error while data parsing!")
+                logger.error("Error while data parsing!" + str(ve))
 
 
 async def waiting_input():
@@ -163,4 +162,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.get_event_loop().run_until_complete(main())
+    asyncio.run(main())
