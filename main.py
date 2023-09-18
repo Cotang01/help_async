@@ -30,20 +30,21 @@ class ParseIni:
         args = parser.parse_args()
         self.currency_source = args.currency_source
         self.sleep = args.sleep
-        self.tracking_point = args.tracking_point
+        self.tracking_point = float(args.tracking_point)
         self.headers = args.headers
         self.log_config = args.log_config
 
 
 class Currency:
 
-    def __init__(self, currency_source, headers, tracking_point):
+    def __init__(self, currency_source, headers, tracking_point, sleep):
         self.currency_source = currency_source
         self.headers = headers
         self.tracking_point = tracking_point
         self.loop = asyncio.get_event_loop()
         self.start_flag = 0
         self.starting_currency = None
+        self.sleep = sleep
 
     async def get_currency_price(self):
         try:
@@ -64,7 +65,6 @@ class Currency:
 
     async def check_currency(self, logger):
         while self.start_flag:
-            await asyncio.sleep(3)
             currency = await self.get_currency_price()
             self.tracking_point = float(self.tracking_point)
             if self.starting_currency is None:
@@ -81,6 +81,7 @@ class Currency:
                         currency)
                 self.starting_currency = currency
                 logger.info(f'{self.starting_currency}')
+            await asyncio.sleep(self.sleep)
 
 
 async def waiting_input():
@@ -103,7 +104,9 @@ async def main():
     logger.addHandler(stream_handler)
 
     logger.info(used_args.log_config)
-    current_currency = Currency(used_args.currency_source, used_args.headers, used_args.tracking_point)
+    current_currency = Currency(used_args.currency_source,
+                                used_args.headers, used_args.tracking_point,
+                                used_args.sleep)
     start = None
     temp = None
     while True:
