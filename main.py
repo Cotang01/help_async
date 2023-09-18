@@ -66,7 +66,6 @@ class Currency:
     async def check_currency(self, logger):
         while self.start_flag:
             currency = await self.get_currency_price()
-            self.tracking_point = float(self.tracking_point)
             if self.starting_currency is None:
                 logger.warning("Start! Current currency value: %f", currency)
                 self.starting_currency = currency
