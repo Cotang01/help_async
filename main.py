@@ -93,7 +93,7 @@ class Currency:
                 logger.info(f'{new_currency}')
                 await asyncio.sleep(self.sleep)
             except (requests.RequestException, ValueError):
-                logger.error("Could not get current currency!")
+                logger.error("Could not get currency from the source!")
                 break
 
 
