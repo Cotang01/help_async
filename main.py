@@ -43,7 +43,7 @@ class Currency:
         self.tracking_point = tracking_point
         self.loop = asyncio.get_event_loop()
         self.start_flag = 0
-        self.starting_currency = None
+        self.current_currency = None
         self.sleep = sleep
 
     async def get_currency_price(self, logger):
@@ -74,23 +74,23 @@ class Currency:
     async def check_currency(self, logger):
         while self.start_flag:
             try:
-                currency = await self.get_currency_price(logger)
-                if currency is None:
+                new_currency = await self.get_currency_price(logger)
+                if new_currency is None:
                     raise ValueError
-                if self.starting_currency is None:
-                    logger.warning("Start! Current currency value: %f", currency)
-                    self.starting_currency = currency
-                elif currency > self.starting_currency + self.tracking_point:
+                if self.current_currency is None:
+                    logger.warning("Start! Current currency value: %f", new_currency)
+                    self.current_currency = new_currency
+                elif new_currency > self.current_currency + self.tracking_point:
                     logger.warning(
                         "The course has grown a lot! Current currency value: %f",
-                        currency)
-                    self.starting_currency = currency
-                elif currency < self.starting_currency - self.tracking_point:
+                        new_currency)
+                    self.current_currency = new_currency
+                elif new_currency < self.current_currency - self.tracking_point:
                     logger.warning(
                         "The course has dropped a lot! Current currency value: %f",
-                        currency)
-                    self.starting_currency = currency
-                logger.info(f'{currency}')
+                        new_currency)
+                    self.current_currency = new_currency
+                logger.info(f'{new_currency}')
                 await asyncio.sleep(self.sleep)
             except (requests.RequestException, ValueError):
                 logger.error("Could not get current currency!")
