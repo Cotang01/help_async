@@ -21,12 +21,12 @@ class ParseIni:
         parser.add_argument('--tracking_point', default=0.5,
                             help='Change rate point')
         parser.add_argument('--headers', default={'User-Agent': 'Mozilla/5.0'},
-                            help='Change rate point')
+                            help='Browser information')
         parser.add_argument('--log_config',
                             default={"level": logging.INFO,
                                      "format": "%(asctime)s %(levelname)s %(message)s",
                                      "filename": "logger.log"},
-                            help='Log configs')
+                            help='Logging format')
         args = parser.parse_args()
         self.currency_source = args.currency_source
         self.sleep = args.sleep
@@ -46,40 +46,46 @@ class Currency:
         self.starting_currency = None
         self.sleep = sleep
 
-    async def get_currency_price(self):
+    async def get_currency_price(self, logger):
         try:
-            full_page = await self.loop.run_in_executor(None, requests.get, self.currency_source, {'headers': self.headers})
+            full_page = await self.loop.run_in_executor(None, requests.get,
+                                                        self.currency_source, {
+                                                            'headers': self.headers})
             full_page.raise_for_status()
 
             soup = BeautifulSoup(full_page.content, 'html.parser')
             convert = soup.findAll("div", {"class": "valvalue"})
-
-            if not convert:
-                raise ValueError("Could not find elements with class 'valvalue'")
-
-            return float(convert[0].text.replace(',', '.'))
-
-        except (requests.RequestException, ValueError) as e:
-            logging.exception("Error when getting exchange rates")
-            raise e
+            try:
+                if not convert:
+                    raise ValueError
+            except (requests.RequestException, ValueError) as ve:
+                logger.error("BeautifulSoup could not find an exchange rates")
+            try:
+                return float(convert[0].text.replace(',', '.'))
+            except AttributeError as ae:
+                logger.error("Exchange rates gotten by BeautifulSoup are "
+                             "inappropriate")
+                raise ae
+        except (requests.RequestException, ValueError, AttributeError) as e:
+            logger.error("Error when getting exchange rates")
 
     async def check_currency(self, logger):
         while self.start_flag:
-            currency = await self.get_currency_price()
+            currency = await self.get_currency_price(logger)
             if self.starting_currency is None:
                 logger.warning("Start! Current currency value: %f", currency)
                 self.starting_currency = currency
-            if currency > self.starting_currency + self.tracking_point:
+            elif currency > self.starting_currency + self.tracking_point:
                 logger.warning(
                     "The course has grown a lot! Current currency value: %f",
                     currency)
-            else:
-                if currency < self.starting_currency - self.tracking_point:
-                    logger.warning(
-                        "The course has dropped a lot! Current currency value: %f",
-                        currency)
                 self.starting_currency = currency
-                logger.info(f'{self.starting_currency}')
+            elif currency < self.starting_currency - self.tracking_point:
+                logger.warning(
+                    "The course has dropped a lot! Current currency value: %f",
+                    currency)
+                self.starting_currency = currency
+            logger.info(f'{currency}')
             await asyncio.sleep(self.sleep)
 
 
