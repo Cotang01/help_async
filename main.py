@@ -10,7 +10,7 @@ import configargparse
 class ParseIni:
     def __init__(self):
         parser = configargparse.ArgParser()
-        parser.add_argument('-c, --config', default='config.ini',
+        parser.add_argument('-c, --config', default='config.txt',
                             is_config_file=True,
                             help='Path to file config.ini')
         parser.add_argument('--currency_source',
@@ -29,7 +29,7 @@ class ParseIni:
                             help='Logging format')
         args = parser.parse_args()
         self.currency_source = args.currency_source
-        self.sleep = args.sleep
+        self.sleep = int(args.sleep)
         self.tracking_point = float(args.tracking_point)
         self.headers = args.headers
         self.log_config = args.log_config
