@@ -10,7 +10,7 @@ import configargparse
 class ParseIni:
     def __init__(self):
         parser = configargparse.ArgParser()
-        parser.add_argument('-c, --config', default='config.ini',
+        parser.add_argument('-c, --config', default='config.txt',
                             is_config_file=True,
                             help='Path to file config.ini')
         parser.add_argument('--currency_source',
@@ -54,22 +54,22 @@ class Currency:
             full_page.raise_for_status()
 
             soup = BeautifulSoup(full_page.content, 'html.parser')
-            convert = soup.findAll("div", {"class": "valvalue"})
+            convert = soup.findAll("div", {"class": "value"})
             try:
                 if not convert:
                     raise ValueError
             except (requests.RequestException, ValueError) as ve:
                 logger.error("BeautifulSoup could not find an exchange "
-                             "rates" + str(ve))
+                             "rates!")
                 raise ve
             try:
                 return float(convert[0].text.replace(',', '.'))
             except AttributeError as ae:
                 logger.error("Exchange rates gotten by BeautifulSoup are "
-                             "inappropriate" + str(ae))
+                             "inappropriate!")
                 raise ae
-        except (requests.RequestException, ValueError, AttributeError) as e:
-            logger.error("Error when getting exchange rates" + str(e))
+        except (requests.RequestException, ValueError, AttributeError):
+            logger.error("Error when getting exchange rates!")
 
     async def check_currency(self, logger):
         while self.start_flag:
@@ -92,8 +92,8 @@ class Currency:
                     self.starting_currency = currency
                 logger.info(f'{currency}')
                 await asyncio.sleep(self.sleep)
-            except (requests.RequestException, ValueError) as ve:
-                logger.error("Could not get current currency!" + str(ve))
+            except (requests.RequestException, ValueError):
+                logger.error("Could not get current currency!")
                 break
 
 
