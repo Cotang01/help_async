@@ -59,34 +59,42 @@ class Currency:
                 if not convert:
                     raise ValueError
             except (requests.RequestException, ValueError) as ve:
-                logger.error("BeautifulSoup could not find an exchange rates")
+                logger.error("BeautifulSoup could not find an exchange "
+                             "rates" + str(ve))
+                raise ve
             try:
                 return float(convert[0].text.replace(',', '.'))
             except AttributeError as ae:
                 logger.error("Exchange rates gotten by BeautifulSoup are "
-                             "inappropriate")
+                             "inappropriate" + str(ae))
                 raise ae
         except (requests.RequestException, ValueError, AttributeError) as e:
-            logger.error("Error when getting exchange rates")
+            logger.error("Error when getting exchange rates" + str(e))
 
     async def check_currency(self, logger):
         while self.start_flag:
-            currency = await self.get_currency_price(logger)
-            if self.starting_currency is None:
-                logger.warning("Start! Current currency value: %f", currency)
-                self.starting_currency = currency
-            elif currency > self.starting_currency + self.tracking_point:
-                logger.warning(
-                    "The course has grown a lot! Current currency value: %f",
-                    currency)
-                self.starting_currency = currency
-            elif currency < self.starting_currency - self.tracking_point:
-                logger.warning(
-                    "The course has dropped a lot! Current currency value: %f",
-                    currency)
-                self.starting_currency = currency
-            logger.info(f'{currency}')
-            await asyncio.sleep(self.sleep)
+            try:
+                currency = await self.get_currency_price(logger)
+                if currency is None:
+                    raise ValueError
+                if self.starting_currency is None:
+                    logger.warning("Start! Current currency value: %f", currency)
+                    self.starting_currency = currency
+                elif currency > self.starting_currency + self.tracking_point:
+                    logger.warning(
+                        "The course has grown a lot! Current currency value: %f",
+                        currency)
+                    self.starting_currency = currency
+                elif currency < self.starting_currency - self.tracking_point:
+                    logger.warning(
+                        "The course has dropped a lot! Current currency value: %f",
+                        currency)
+                    self.starting_currency = currency
+                logger.info(f'{currency}')
+                await asyncio.sleep(self.sleep)
+            except (requests.RequestException, ValueError) as ve:
+                logger.error("Could not get current currency!" + str(ve))
+                break
 
 
 async def waiting_input():
