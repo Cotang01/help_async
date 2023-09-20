@@ -10,7 +10,7 @@ import configargparse
 class ParseIni:
     def __init__(self):
         parser = configargparse.ArgParser()
-        parser.add_argument('-c, --config', default='config.ini',
+        parser.add_argument('-c, --config', default='config.txt',
                             is_config_file=True,
                             help='Path to file config.ini')
         parser.add_argument('--currency_source',
@@ -54,7 +54,7 @@ class Currency:
             full_page.raise_for_status()
 
             soup = BeautifulSoup(full_page.content, 'html.parser')
-            convert = soup.findAll("div", {"class": "value"})
+            convert = soup.findAll("div", {"class": "valvalue"})
             try:
                 if not convert:
                     raise ValueError
