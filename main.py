@@ -10,7 +10,7 @@ import configargparse
 class ParseIni:
     def __init__(self):
         parser = configargparse.ArgParser()
-        parser.add_argument('-c, --config', default='config.txt',
+        parser.add_argument('-c, --config', default='config.ini',
                             is_config_file=True,
                             help='Path to file config.ini')
         parser.add_argument('--currency_source',
