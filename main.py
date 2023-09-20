@@ -78,7 +78,8 @@ class Currency:
                 if new_currency is None:
                     raise ValueError
                 if self.current_currency is None:
-                    logger.warning("Start! Current currency value: %f", new_currency)
+                    logger.warning("Start! Current currency value: %f",
+                                   new_currency)
                     self.current_currency = new_currency
                 elif new_currency > self.current_currency + self.tracking_point:
                     logger.warning(
@@ -117,19 +118,19 @@ async def main():
     logger.addHandler(stream_handler)
 
     logger.info(used_args.log_config)
-    current_currency = Currency(used_args.currency_source,
-                                used_args.headers, used_args.tracking_point,
-                                used_args.sleep)
+    currency_gather = Currency(used_args.currency_source,
+                               used_args.headers, used_args.tracking_point,
+                               used_args.sleep)
     start = None
     temp = None
     while True:
         if start == "Currency":
-            current_currency.start_flag = 1
-            temp = asyncio.gather(current_currency.check_currency(logger))
+            currency_gather.start_flag = 1
+            temp = asyncio.gather(currency_gather.check_currency(logger))
         elif start == 'Price':
-            logger.info(current_currency.starting_currency)
+            logger.info(currency_gather.current_currency)
         elif start == 'Exit':
-            current_currency.start_flag = 0
+            currency_gather.start_flag = 0
             try:
                 await temp
             except Exception as e:
