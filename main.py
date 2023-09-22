@@ -55,17 +55,19 @@ class Currency:
                 {'headers': self.headers})
             full_page.raise_for_status()
             soup = BeautifulSoup(full_page.content, 'html.parser')
-            convert = soup.findAll("div", {"class": "valvalue"})
+            convert = soup.findAll("div", {"class": "lvalue"})
             return float(convert[0].text.replace(',', '.'))
 
-        except ValueError as ve:
-            logger.error("The obtained element is not a number")
-            raise ve
         except requests.RequestException as rre:
             logger.error("Could not get answer from web-source")
             raise rre
-        except IndexError:
-            logger.error("Could not find objects of class 'valvalue'")
+        except ValueError as ve:
+            logger.error("The obtained element is not a number")
+            raise ve
+        except IndexError as ie:
+            logger.error("BeautifulSoup didn't find objects of class "
+                         "'valvalue'")
+            raise ie
 
     async def check_currency(self, logger):
         while self.start_flag:
@@ -95,7 +97,7 @@ class Currency:
                 logger.error("The result of currency price is None")
                 raise ve
             except IndexError as ie:
-                logger.error("Could not find objects of class 'valvalue'")
+                logger.error("Gathered data has no elements")
                 raise ie
             except asyncio.CancelledError as ace:
                 logger.warning("The sleep of check_currency() hasn't been "
@@ -167,7 +169,7 @@ async def main():
         except ValueError:
             logger.error("The program couldn't to work with NoneType")
         except IndexError:
-            logger.error("Index ouf of bounds")
+            logger.error("The program tried to reach nonexistent element")
         except asyncio.CancelledError:
             logger.warning("Last call was cancelled")
 
