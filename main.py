@@ -55,7 +55,7 @@ class Currency:
                 {'headers': self.headers})
             full_page.raise_for_status()
             soup = BeautifulSoup(full_page.content, 'html.parser')
-            convert = soup.findAll("div", {"class": "lvalue"})
+            convert = soup.findAll("div", {"class": "valvalue"})
             return float(convert[0].text.replace(',', '.'))
 
         except requests.RequestException as rre:
@@ -154,7 +154,8 @@ async def main():
                 currency_gather.start_flag = 0
                 run = False
                 if temp is not None:
-                    temp.cancel()
+                    # Force exit
+                    # temp.cancel()
                     await temp
                 logger.warning("The program has been stopped")
             else:
