@@ -10,7 +10,7 @@ import configargparse
 class ParseIni:
     def __init__(self):
         parser = configargparse.ArgParser()
-        parser.add_argument('-c, --config', default='config.ini',
+        parser.add_argument('-c, --config', default='config.txt',
                             is_config_file=True,
                             help='Path to file config.ini')
         parser.add_argument('--currency_source',
@@ -96,8 +96,8 @@ class Currency:
             except IndexError as ie:
                 logger.exception(f"{ie}")
                 raise
-            except asyncio.CancelledError as ace:
-                logger.exception(f"{ace}")
+            except asyncio.CancelledError:
+                logger.warning(f"The program has been stopped")
                 raise
 
 
@@ -128,19 +128,15 @@ async def main():
     currency_gather = Currency(used_args.currency_source,
                                used_args.headers, used_args.tracking_point,
                                used_args.sleep)
-    temp = None
+
+    currency_gather.start_flag += 1
+    temp = asyncio.gather(currency_gather.check_currency(logger))
+    logger.warning("Type 'Exit' if you meet any errors")
     run = True
     while run:
         try:
             start = await waiting_input()
-            if start == "Currency":
-                if currency_gather.start_flag == 0:
-                    currency_gather.start_flag += 1
-                    temp = asyncio.gather(currency_gather.check_currency(logger))
-                    logger.warning("Type 'Exit' if you meet any errors")
-                else:
-                    logger.warning("The program has already started tracking currency exchange rates!")
-            elif start == 'Price':
+            if start == 'Price':
                 if currency_gather.start_flag != 1:
                     logger.warning("The program has not started tracking "
                                    "currency exchange rates")
@@ -151,7 +147,7 @@ async def main():
                 run = False
                 if temp is not None:
                     # Force exit
-                    # temp.cancel()
+                    temp.cancel()
                     await temp
                 logger.warning("The program has been stopped")
             else:
