@@ -107,7 +107,7 @@ async def waiting_input():
         None,
         input,
         'Enter command:\n'
-        'Choose: Currency, Price, Exit\n')
+        'Choose: Price, Exit\n')
 
 
 async def main():
@@ -137,11 +137,8 @@ async def main():
         try:
             start = await waiting_input()
             if start == 'Price':
-                if currency_gather.start_flag != 1:
-                    logger.warning("The program has not started tracking "
-                                   "currency exchange rates")
-                else:
-                    logger.info(currency_gather.current_currency)
+                logger.info(f"Current exchange rates value: "
+                            f"{currency_gather.current_currency}")
             elif start == 'Exit':
                 currency_gather.start_flag = 0
                 run = False
@@ -154,7 +151,6 @@ async def main():
                 logger.warning(
                     'There is no such command\n'
                     'List of commands:\n'
-                    'Currency - launch currency rate tracking and logging\n'
                     'Price - current price value\n'
                     'Exit - exit')
         except requests.RequestException:
