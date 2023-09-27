@@ -1,4 +1,5 @@
 import asyncio
+import logging
 
 import requests
 from bs4 import BeautifulSoup
@@ -42,9 +43,7 @@ class Currency:
             Fetches the current currency price from the source.
         check_currency(logger):
             Checks the currency price periodically and logs any changes.
-
     """
-
     def __init__(self, currency_source, headers, tracking_point, sleep):
         """
         Sets the attributes of the Currency class object using incoming
@@ -100,22 +99,17 @@ class Currency:
         except (requests.RequestException, ValueError,  IndexError):
             raise
 
-    async def check_currency(self, logger) -> None:
+    async def check_currency(self, logger: logging.Logger) -> None:
         """
         Checks the currency price periodically and logs any changes.
 
         :argument logger: Configured logger
         :type logger: logger.Logger
 
-        :raises requests.RequestException:
-            If there is an error in making the HTTP request.
-        :raises ValueError:
-            If the fetched element is of NoneType or there is an error in
-            converting the price to float.
-        :raises IndexError:
-            If there is an error in accessing the fetched element.
+        :raises requests.RequestException, ValueError, IndexError:
+            If it was raised by `get_currency_price`
         :raises asyncio.CancelledError:
-            If the program was stopped by cancelling request
+            If the program was stopped by user's interaction
         """
         while self.start_flag:
             try:
