@@ -95,7 +95,6 @@ class Currency:
             full_page.raise_for_status()
             soup = BeautifulSoup(full_page.content, 'html.parser')
             convert = soup.findAll("div", {"class": "valvalue"})
-
             return float(convert[0].text.replace(',', '.'))
 
         except (requests.RequestException, ValueError,  IndexError):
@@ -140,8 +139,8 @@ class Currency:
                 await asyncio.sleep(self.sleep)
 
             except (requests.RequestException, ValueError, IndexError) as e:
-                logger.exception(f"{e}")
+                logger.exception(e)
                 raise
             except asyncio.CancelledError:
-                logger.warning(f"The program has been stopped")
+                logger.warning("The program has been stopped")
                 raise
