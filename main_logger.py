@@ -2,7 +2,7 @@ import logging
 import sys
 
 
-def log(log_config, json_data):
+def log(log_config: str, json_data: dict) -> logging.Logger:
     """
     Creates and sets logger for generating logs in .log file and console
     outputs.
