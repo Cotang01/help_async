@@ -46,8 +46,8 @@ class Currency:
     """
     def __init__(self, currency_source, headers, tracking_point, sleep):
         """
-        Sets the attributes of the Currency class object using incoming
-        parameters.
+        Sets the attributes of the Currency class object using
+        incoming parameters.
 
         :param currency_source: The source URL for getting currency prices.
         :type currency_source: str
@@ -59,7 +59,7 @@ class Currency:
         :type tracking_point: float
 
         :param sleep: The time interval between currency checks.
-        :type self: int
+        :type sleep: int
         """
         self.currency_source = currency_source
         self.headers = headers
