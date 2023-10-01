@@ -36,7 +36,7 @@ class ParseIni:
                             help='HTTP headers for making requests to the currency source')
         parser.add_argument('--log_config',
                             default={"level": logging.INFO,
-                                     "msg_format": "%(asctime)s %(levelname)s %(message)s",
+                                     "format": "%(asctime)s %(levelname)s %(message)s",
                                      "filename": "logger.log"},
                             help='Configuration parameters for logging')
 
