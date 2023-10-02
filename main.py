@@ -1,7 +1,7 @@
 import asyncio
 import requests
 import json
-from logger import log
+from logger import get_logger
 from currency import Currency
 from parsers import ParseIni
 import aioconsole
@@ -16,9 +16,9 @@ async def main():
     The program's behaviour depends on user's inputs.
     """
     used_args = ParseIni()
-    logger = log(used_args.log_config.get('level'),
-                 used_args.log_config.get('format'),
-                 used_args.log_config.get('filename'))
+    logger = get_logger(used_args.log_config.get('level'),
+                        used_args.log_config.get('format'),
+                        used_args.log_config.get('filename'))
 
     currency_gather = Currency(used_args.currency_source,
                                used_args.headers,

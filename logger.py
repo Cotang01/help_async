@@ -2,10 +2,10 @@ import logging
 import sys
 
 
-def log(level: str, msg_format: str, filename: str) -> logging.Logger:
+def get_logger(level: str, msg_format: str, filename: str) -> logging.Logger:
     """
-    Creates and sets logger for generating log messages in .log file and
-    console outputs.
+    Creates and sets logger for generating log messages in file and console
+    outputs.
 
     :param level: Level of log messages
     :type level: str
