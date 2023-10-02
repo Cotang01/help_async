@@ -1,3 +1,4 @@
+import json
 import logging
 import configargparse
 
@@ -47,4 +48,4 @@ class ParseIni:
         self.sleep = int(args.sleep)
         self.tracking_point = float(args.tracking_point)
         self.headers = args.headers
-        self.log_config = args.log_config
+        self.log_config = json.loads(args.log_config)

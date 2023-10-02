@@ -16,10 +16,9 @@ async def main():
     The program's behaviour depends on user's inputs.
     """
     used_args = ParseIni()
-    json_data = json.loads(used_args.log_config)
-    logger = log(json_data.get('level'),
-                 json_data.get('format'),
-                 json_data.get('filename'))
+    logger = log(used_args.log_config.get('level'),
+                 used_args.log_config.get('format'),
+                 used_args.log_config.get('filename'))
 
     currency_gather = Currency(used_args.currency_source,
                                used_args.headers,
