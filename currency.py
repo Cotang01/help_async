@@ -94,6 +94,8 @@ class Currency:
             full_page.raise_for_status()
             soup = BeautifulSoup(full_page.content, 'html.parser')
             convert = soup.findAll("div", {"class": "valvalue"})
+            if convert is None:
+                raise ValueError
             return float(convert[0].text.replace(',', '.'))
 
         except (requests.RequestException, ValueError,  IndexError):
@@ -114,8 +116,6 @@ class Currency:
         while True:
             try:
                 new_currency = await self.get_currency_price()
-                if new_currency is None:
-                    raise ValueError("The gathered element is NoneType")
                 if self.current_currency is None:
                     logger.warning(
                         f"Start! Current currency value: {new_currency}")
