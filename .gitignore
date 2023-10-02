@@ -6,6 +6,10 @@ __pycache__/
 # C extensions
 *.so
 
+# Random files
+.idea/
+test.py
+
 # Distribution / packaging
 .Python
 build/
