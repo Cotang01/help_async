@@ -130,7 +130,8 @@ class Currency:
                 if self.current_currency != new_currency:
                     self.current_currency = new_currency
                 logger.info(f'Current exchange rates value: {new_currency}')
-                self.data_is_ready.set()
+                if not self.data_is_ready.is_set():
+                    self.data_is_ready.set()
                 await asyncio.sleep(self.sleep)
 
             except (requests.RequestException, ValueError, IndexError):
