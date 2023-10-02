@@ -34,6 +34,8 @@ class Currency:
             The current currency price.
         sleep : int
             The time interval between currency checks.
+        data_is_ready : Event
+            Flag that will track if one iteration of currency checking is done.
 
     Methods
     -------
