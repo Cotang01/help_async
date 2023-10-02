@@ -1,6 +1,5 @@
 import asyncio
 import requests
-import json
 from logger import get_logger
 from currency import Currency
 from parsers import ParseIni
