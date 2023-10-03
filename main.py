@@ -25,7 +25,7 @@ async def main():
                                used_args.sleep)
 
     currency_tracking = asyncio.create_task(currency_gather.check_currency(logger))
-    logger.warning("Starting tracking currency exchange rates, please wait...")
+    logger.warning('Starting tracking currency exchange rates, please wait...')
     await currency_gather.data_is_ready.wait()
 
     while True:
@@ -33,8 +33,8 @@ async def main():
             start = await aioconsole.ainput('Enter command:\n'
                                             'Choose: Price, Exit\n')
             match start.lower():
-                case 'price': logger.info(f"Current exchange rates value: "
-                                          f"{currency_gather.current_currency}")
+                case 'price': logger.info(f'Current exchange rates value: '
+                                          f'{currency_gather.current_currency}')
                 case 'exit':
                     currency_tracking.cancel()
                     break
@@ -49,5 +49,5 @@ async def main():
             pass
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     asyncio.run(main())

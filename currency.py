@@ -93,7 +93,7 @@ class Currency:
 
             full_page.raise_for_status()
             soup = BeautifulSoup(full_page.content, 'html.parser')
-            convert = soup.findAll("div", {"class": "valvalue"})
+            convert = soup.findAll('div', {'class': 'valvalue'})
             if convert is None:
                 raise ValueError
             return float(convert[0].text.replace(',', '.'))
@@ -118,26 +118,26 @@ class Currency:
                 new_currency = await self.get_currency_price()
                 if self.current_currency is None:
                     logger.warning(
-                        f"Start! Current currency value: {new_currency}")
+                        f'Start! Current currency value: {new_currency}')
                 elif new_currency > self.current_currency + self.tracking_point:
                     logger.warning(
-                        f"The course has grown a lot! Current currency "
-                        f"value: {new_currency}")
+                        f'The course has grown a lot! Current currency '
+                        f'value: {new_currency}')
                 elif new_currency < self.current_currency - self.tracking_point:
                     logger.warning(
-                        f"The course has dropped a lot! Current currency "
-                        f"value: {new_currency}")
+                        f'The course has dropped a lot! Current currency '
+                        f'value: {new_currency}')
                 if self.current_currency != new_currency:
                     self.current_currency = new_currency
                 logger.info(f'Current exchange rates value: {new_currency}')
                 if not self.data_is_ready.is_set():
                     self.data_is_ready.set()
-                await asyncio.sleep(self.sleep)
 
             except (requests.RequestException, ValueError, IndexError):
-                logger.error("Some errors occurred when trying to get "
-                             "exchange rates... Solving the problem...")
-                await asyncio.sleep(self.sleep)
+                logger.error('Some errors occurred when trying to get '
+                             'exchange rates... Solving the problem...')
             except asyncio.CancelledError:
-                logger.warning("The program has been stopped")
+                logger.warning('The program has been stopped')
                 raise
+            finally:
+                await asyncio.sleep(self.sleep)
