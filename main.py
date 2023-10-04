@@ -37,6 +37,7 @@ async def main():
                                           f'{currency_gather.current_currency}')
                 case 'exit':
                     currency_tracking.cancel()
+                    logger.warning('The program has been stopped')
                     break
                 case _:
                     logger.warning(

@@ -132,12 +132,8 @@ class Currency:
                 logger.info(f'Current exchange rates value: {new_currency}')
                 if not self.data_is_ready.is_set():
                     self.data_is_ready.set()
-
             except (requests.RequestException, ValueError, IndexError):
                 logger.error('Some errors occurred when trying to get '
                              'exchange rates... Solving the problem...')
-            except asyncio.CancelledError:
-                logger.warning('The program has been stopped')
-                raise
-            finally:
+            if not asyncio.current_task().cancelled():
                 await asyncio.sleep(self.sleep)
