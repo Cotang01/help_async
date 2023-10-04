@@ -28,8 +28,8 @@ async def main():
     logger.warning('Starting tracking currency exchange rates, please wait...')
     await currency_gather.data_is_ready.wait()
 
-    try:
-        while True:
+    while True:
+        try:
             start = await aioconsole.ainput('Enter command:\n'
                                             'Choose: Price, Exit\n')
             match start.lower():
@@ -37,7 +37,7 @@ async def main():
                                           f'{currency_gather.current_currency}')
                 case 'exit':
                     currency_tracking.cancel()
-                    logger.warning('The program has been stopped')
+                    logger.warning('The program has been stopped!')
                     break
                 case _:
                     logger.warning(
@@ -45,9 +45,9 @@ async def main():
                         'List of commands:\n'
                         'Price - current price value\n'
                         'Exit - exit')
-    except (requests.RequestException, ValueError, IndexError,
-            asyncio.CancelledError):
-        pass
+        except (requests.RequestException, ValueError, IndexError,
+                asyncio.CancelledError):
+            pass
 
 
 if __name__ == '__main__':

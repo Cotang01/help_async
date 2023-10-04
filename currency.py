@@ -135,5 +135,4 @@ class Currency:
             except (requests.RequestException, ValueError, IndexError):
                 logger.error('Some errors occurred when trying to get '
                              'exchange rates... Solving the problem...')
-            if not asyncio.current_task().cancelled():
-                await asyncio.sleep(self.sleep)
+            await asyncio.sleep(self.sleep)
