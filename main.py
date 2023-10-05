@@ -1,7 +1,7 @@
 import asyncio
 import requests
-from app.logger import get_logger
-from app.currency import Currency
+from logger import get_logger
+from currency import Currency
 from parsers import ParseIni
 import aioconsole
 
