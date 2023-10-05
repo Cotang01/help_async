@@ -8,7 +8,7 @@ __pycache__/
 
 # Random files
 .idea/
-test.py
+app/test.py
 
 # Distribution / packaging
 .Python
