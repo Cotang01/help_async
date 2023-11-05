@@ -1,0 +1,17 @@
+version: '3'
+services:
+  bot:
+    container_name: mybot
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - cfg.env
+    environment:
+      - LOG_FILE=${LOG_FILE}
+      - LOG_LEVEL=${LOG_LEVEL}
+      - LOG_FORMAT=${LOG_FORMAT}
+      - TOKEN=${TOKEN}
+    volumes:
+      - ./${LOG_FILE}:/app/${LOG_FILE}
+    command: python bot.py
