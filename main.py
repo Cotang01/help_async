@@ -33,8 +33,9 @@ async def main():
             start = await aioconsole.ainput('Enter command:\n'
                                             'Choose: Price, Exit\n')
             match start.lower():
-                case 'price': logger.info(f'Current exchange rates value: '
-                                          f'{currency_gather.current_currency}')
+                case 'price':
+                    logger.info(f'Current exchange rates value: '
+                                f'{currency_gather.current_currency}')
                 case 'exit':
                     currency_tracking.cancel()
                     logger.warning('The program has been stopped!')
