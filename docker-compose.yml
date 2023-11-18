@@ -1,17 +1,13 @@
 version: '3'
 services:
   bot:
+    image: tele-bot:1.0
     container_name: mybot
     build:
       context: .
       dockerfile: Dockerfile
     env_file:
       - cfg.env
-    environment:
-      - LOG_FILE=${LOG_FILE}
-      - LOG_LEVEL=${LOG_LEVEL}
-      - LOG_FORMAT=${LOG_FORMAT}
-      - TOKEN=${TOKEN}
     volumes:
-      - ./${LOG_FILE}:/app/${LOG_FILE}
+      - ./logger.log:/app/logger.log
     command: python bot.py
