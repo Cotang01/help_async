@@ -37,3 +37,9 @@ Dockerfile docker-compose.yml)
 
 Если возникает ошибка "http: invalid Host header":
 snap refresh --revision=2893 docker
+
+Пулл моего образа:
+docker pull cotang/tele-bot:1.0
+
+Запуск со своим .env конфигом:
+docker run -d --env-file cfg.env cotang/tele-bot:1.0
