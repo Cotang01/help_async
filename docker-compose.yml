@@ -1,6 +1,7 @@
 version: '3'
 services:
   bot:
+    image: tele-bot:1.0
     container_name: mybot
     build:
       context: .
@@ -8,5 +9,5 @@ services:
     env_file:
       - cfg.env
     volumes:
-      - ./${LOG_FILE}:/app/${LOG_FILE}
+      - ./logger.log:/app/logger.log
     command: python bot.py
