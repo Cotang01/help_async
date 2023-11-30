@@ -5,18 +5,13 @@ Python version 3.11.3
 
 Действия для запуска бота в Dockerfile:
 (В одной директории должны быть файлы: 
-bot.py config.env  Dockerfile  logger.log  
+bot.py "ваш конфиг".env  Dockerfile  logger.log  
 logger.py requirements.txt)
 1. docker build -t <ваше название контейнера>
-2. Команда запуска для Linux:
+2. Команда запуска:
     docker run -d 
     -v $(pwd)/logger.log:/app/logger.log 
-    -v $(pwd)/config.env:/app/config.env
-    <ваше название контейнера>
-3. Команда запуска для Windows:
-    docker run -d 
-    -v ${PWD}/logger.log:/app/logger.log 
-    -v ${PWD}/config.env:/app/config.env 
+    -v $(pwd)/"ваш конфиг".env:/app/"ваш конфиг".env
     <ваше название контейнера>
 
 Если logger.log не оказывается на хостовой машине, то контейнер создаёт его
@@ -24,11 +19,8 @@ logger.py requirements.txt)
 в конце монтирования файла добавить ":z"
 
 Запуск бота с docker-compose:
-(В одной директории должны быть файлы, если хост Linux:
-bot.py configLin.env logger.py requirements.txt logger.log
-Dockerfile docker-compose.yml)
-(Если хост Windows:
-bot.py configWin.env logger.py requirements.txt logger.log
+(В одной директории должны быть файлы:
+bot.py "ваш конфиг".env logger.py requirements.txt logger.log
 Dockerfile docker-compose.yml)
 1. docker-compose up -d
 
@@ -38,8 +30,12 @@ Dockerfile docker-compose.yml)
 Если возникает ошибка "http: invalid Host header":
 snap refresh --revision=2893 docker
 
-Пулл моего образа:
-docker pull cotang/tele-bot:1.0
+Запуск приватного репозитория:
 
-Запуск со своим .env конфигом:
-docker run -d --env-file cfg.env cotang/tele-bot:1.0
+docker run -d -p 5000:5000 --restart=always --name registry registry:2
+
+Пулл образа:
+docker pull "repo"/"image"
+
+Запуск образа со своим .env конфигом:
+docker run -d --env-file ".env" "repo"/"image"
