@@ -1,4 +1,4 @@
-from add_numbers import add_numbers
+from src.add_numbers import add_numbers
 
 
 def test_add_numbers():

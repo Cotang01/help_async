@@ -19,4 +19,4 @@ jobs:
           pip install pytest
       - uses: actions/checkout@v3
       - name: Run test
-        run: pytest add_nums/test_add_nums.py
+        run: pytest src/test_add_nums.py
