@@ -1,0 +1,20 @@
+
+name: TestCode
+
+
+on:
+  
+  push:
+    branches: [ "bot" ]
+  pull_request:
+    branches: [ "bot" ]
+    
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run test
+        run: pytest test/test_add_nums.py
