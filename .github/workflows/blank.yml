@@ -1,0 +1,19 @@
+
+name: CI
+
+on:
+  push:
+    branches: [ "bot" ]
+  pull_request:
+    branches: [ "bot" ]
+
+  workflow_dispatch:
+
+
+jobs:
+  build:   
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run tests
+        run: pytest test_add_nums.py
