@@ -1,6 +1,7 @@
 
 
 def add_numbers(num1: int | float, num2: int | float) -> int | float:
+    """Function that adds int and float nums accurately"""
     float_num1_length = 0
     float_num2_length = 0
     if isinstance(num1, float):
